@@ -14,3 +14,4 @@ The general structure of my notes is *Overview*, *Summary*, *Notes* (each more d
 * **STATG004 Bayesian Stats**: Introduction to Bayesian statistics.
 * **STATG017 Stochastic Finance 1**: Derivative pricing, Stochastic Calculus, Black Scholes, The Greeks.
 * **STATG020 Stochastic Finance 2**: Market Risk, Credit Risk, Asset pricing techniques
+* **Summary.rst**: *(Work in progress)* Summary of the main areas of statistics and machine learning I have studied.

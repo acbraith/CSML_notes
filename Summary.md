@@ -102,11 +102,12 @@
 
 ### Supervised Learning
 
-#### Linear Regression
+#### Regression
 
 - Least Squares
     - `D = (xᵢ,yᵢ) , i = 1,...,m , xᵢ∈Rⁿ`
         - `X = (x₁,x₂,...)ᵀ , y = (y₁,y₂,...)ᵀ`
+            - ie for `X`, each row is an `xᵢ`
     - Assume
         - `yᵢ ~ N(βᵀxᵢ, σ²I)`
     - Minimise square error
@@ -115,20 +116,38 @@
             - Cannot be solved if `XᵀX` cannot be inverted (determinant = 0)
     - Robust Regression
         - L1, L2 regularisation (*weight decay*)
+            - First scale input dimensions to unit variance
             - Add penalty term to error
                 - `E(β) = Σ(βᵀxᵢ-yᵢ)² + λ|β|ₙ`
                 - L1 Regularisation (*lasso*)
                     - Take L1 norm of `β`; encourages sparse solutions
-                    - Harder to compute
+                    - Non-differentiable; need special optimisation routines
                 - L2 Regularisation (*ridge regression*)
                     - `dE/dβ = 0 => (XᵀX+λI)β = Xᵀy`
                         - `(XᵀX+λI)` always invertible
+- Kernel Ridge Regression, Gaussian Process
+    - (GPs can also be used for classification)
 
-#### Generalised Linear Models
+#### Classification
 
-- Components
-- Exponential Family
-- Logistic Regression
+- Generative Models
+    - Nearest Neighbours
+        - Classify `x` using `k` nearest points in training set
+        - Distances:
+            - Squared Euclidean: `d(x,t) = (x-t)ᵀ(x-t)`
+                - Loses information if length scales of components of `x` vary
+            - Mahalanobis: `d(x,t) = (x-t)ᵀΣ⁻¹(x-t)` (`Σ` is covariance of all inputs)
+                - Rescales components of `x`
+        - Gives smooth boundaries, but slow and large space requirements
+        - Classifies distant test points very confidently
+    - Naive Bayes
+        - `P(c|x) = P(x|c) P(c) / P(x)` (`P(x) = ΣₖP(x|k)P(k)`)
+        - Fast to train; just need to count for discrete attributes
+        - Overly confident with low counts; add pseudo counts for classes to help reduce this issue
+- Discriminative Models
+    - Logistic Regression
+    - SVM, Decision Trees, Ensemble methods
+        - (all can also be used for regression)
 
 #### Kernel Methods
 
@@ -194,8 +213,6 @@
         => β|D ～ N(βₘₐₚ, Σ) (Σ⁻¹ = 1/σ² (XᵀX+σ²I))
         ```
 
-
-
 #### Decision Trees
 
 - Classification and Regression Trees (*CART*)
@@ -210,25 +227,84 @@
             - Recurse until each node contains max of `n` data points
         - Regularisation
             - Successively collapse nodes giving smallest per-node increase in training error
-            - From sequence of trees `T₁, T₂, T₃...` select tree minimising `<Train Error>(T) + λ|T|`
+            - From sequence of trees `T₁, T₂, T₃...` select tree minimising `<Train Error>(Tᵢ) + λ|Tᵢ|`
     - Classification
-        - 
+        - Growing Tree
+            - Minimise one of
+                - Gini Index `= Σₖρₙₖ(1-ρₙₖ)`
+                - Cross Entropy `= Σₖρₙₖlog(1/ρₙₖ)`
+                    - `ρₙₖ = 1/m ΣₓI(yᵢ=k)` (empirical class `k` probability for region `n`)
+        - Pruning Tree
+            - Prune smallest misclassification error `= 1 - argmaxₖρₙₖ`
 
 #### Ensemble Methods
 
 - Bagging
+    - Reduce **variance** by averaging over ensemble
+        - Use high variance but low bias estimators; eg decision trees
+    - Train T variations, each on `M` examples (sampled *with* repleacement => ~63% non-repeats)
+        - Conventially, `M` is size of training set
+    - Random Forest
+        - Decision Trees high variance; use bagging to reduce this
+        - Can train each tree with only a subset of `k` features; further decorrelates trees in ensemble
+            - Usually `k = √d` or `k = log(d)`
 - Boosting
+    - Reduce **bias** by focusing on hard examples
+        - Use lower variance but high bias estimators; eg decision stumps
+    - Adaboost
+        - Initialise `D₁(1),...,D₁(m) = 1/m` (training point weights)
+        - for `t = 1,...,T`
+            ```
+             Fit hₜ : Rᵈ->(-1,1) (using Dₜ)
+                 αₜ = 1/2 log((1-εₜ)/εₜ) , εₜ=weighted training error
+            Dₜ₊₁(i) α Dₜ(i) exp(-αₜyᵢhₜ(xᵢ)) (ΣᵢDₜ₊₁(i) = 1)
+            ```
+        - Return `H(x) = sign(Σₜαₜhₜ(x))`
+            - Linear combination of weak learners, weighted by training errors
+        - Adaboost greedily solves
+            - `min[ΣᵢL(yᵢ,Σₜαₜhₜ(xᵢ))]`, where `L(y,ŷ) = exp(-yŷ)`
+                - Exponential loss punishes negative margins
+                - Minimising exponential loss for `hₜ` with fixed `αₜ` equivalent to minimising misclassification error
 
 #### Neural Networks
 
+- **TODO Use Advanced ML Notes**
 - Deep Network Layers
 - Convolutional Networks
 - Recurrent Networks
 - Attention and Memory
 - Optimisation
+    - First Order Methods
+        - Gradient Descent
+            - `βₖ₊₁ = βₖ - α∇f(βₖ)`
+                - Easy to get stuck in local optima
+                - Too big `α` -> Could diverge
+        - Momentum
+            - `gₖ₊₁ = μₖgₖ - α∇f(βₖ)`
+            - `βₖ₊₁ = βₖ + gₖ₊₁`
+                - Good for noisy gradients, helps with crossing flat regions of gradient (eg saddle points)
+        - Adam
+            - Use running average of gradient and second moment of gradient, with some clever normalisation
+        - Line Search
+            - Pick direction (eg steepest direction) and find optimum in given direction
+    - Second Order Methods
+        - Newton's Method
+            - Taylor expand `f(β+Δ)` to second order
+            - `βₖ₊₁ = βₖ - α H⁻¹∇f`
+                - Converge in 1 step for quadratic function, `α=1`
+                - Invariant under coordinate transform
+                - Calculating `H⁻¹∇f` and storing `H` expensive
+                - Not guaranteed to produce downhill step
+                    - Line search in `H⁻¹∇f` direction instead
+    - Large Scale Learning
+        - Online Stochastic Gradient Descent
+            - Train on mini-batches
+            - Very parallelisable and robust to synchronisation issues
+            - More robust than training on whole training set each iteration; can help reduce overfitting
 
 #### Feature Selection
 
+- **TODO from Statistics Notes**
 - t-tests, F-tests
 - Akaike Information Criteria, Cross-Validation
 - Stepwise methods

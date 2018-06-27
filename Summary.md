@@ -100,6 +100,80 @@
 
 ---
 
+### Maths Basics
+
+- **TODO See if anything to add from Matrix Cookbook and Unsupervised Notes**
+- Linear Algebra
+    - Matrix Determinant, Trace, Inverse, Rank
+    ```
+    A = |a b| => det(A) = ad-bc
+        |c d|     
+      det(Aᵀ) = det(A)
+      det(AB) = det(A) det(B)
+     det(A⁻¹) = 1/det(A)
+        tr(A) = Σᵢaᵢᵢ
+    tr(log A) = log det(A)
+         A⁻¹A = I
+       (AB)⁻¹ = B⁻¹A⁻¹
+       (ABC)ᵀ = CᵀBᵀAᵀ
+    ```
+    - Orthogonality
+        - `AᵀA = I = AAᵀ => Aᵀ = A⁻¹ <=> A` is orthogonal
+    - Eigenvectors / Eigenvalues
+        ```
+        Ae = λe
+            e: eigenvectors
+            λ: eigenvalues
+        (A-λI)e = 0 => λ is eigenvalue if det(A-λI) = 0
+        A = Σᵢeᵢeᵢᵀ
+            (eigenvectors are orthogonal to each other; ∀i≠j.eᵢᵀeⱼ = 0)
+         tr(A) = Σᵢaᵢᵢ = Σᵢλᵢ
+        det(A) = Πᵢλᵢ
+        ```
+    - Singular Value Decomposition
+        ```
+        X = USVᵀ
+            X: nxp
+            U: nxn, UᵀU=Iₙ
+            V: pxp, VᵀV=Iₚ
+            S: nxp, S is diagonal, all +ve and ordered (largest top left)
+        ```
+    - Positive (Semi) Definite
+        ```
+        PSD if ∀z.zᵀAz ≥ 0 (PD if > 0)
+        ```
+        - eg `I` is PSD
+        - Negative (Semi) Definite analogous
+- Calculus
+    - Differentiation
+        ```
+        df/dx = lim_{δ->0} [f(x+δ)-f(x)] / δ = f'(x)
+        ```
+    - Taylor Series
+        `f(x) = f(0) + x df/dx + x²/2! d²f/dx² + ...`
+    - Chain Rule
+        ```
+        df(g(x))   df . dg
+          dx     = dg   dx
+        ```
+    - Matrix Calculus
+        - Jacobian, `∇f(x)`
+            - (Column) vector of first derivatives
+        - Hessian, `H_f(x)`
+            - Matrix of second derivatives
+            - `Hᵢⱼ=d²f/dxᵢxⱼ`
+        ```
+           d/dA tr(AB) = Bᵀ
+          d log det(A) = d tr(logA) = tr(A⁻¹ dA)
+        d/dA log det A = Aᵀ
+                  dA⁻¹ = -AᵀdAA⁻¹
+        ```
+- Convex Analysis
+- Numerical Issues
+- Distributions
+    - Multi-variate Gaussian
+
+
 ### Supervised Learning
 
 #### Regression
@@ -146,6 +220,7 @@
         - Overly confident with low counts; add pseudo counts for classes to help reduce this issue
 - Discriminative Models
     - Logistic Regression
+        - **TODO From Applied ML Notes**
     - SVM, Decision Trees, Ensemble methods
         - (all can also be used for regression)
 
